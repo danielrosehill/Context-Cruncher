@@ -41,11 +41,6 @@
             margin-bottom: 0.5rem;
         }
 
-        .header .icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-
         .header p {
             font-size: 1.2rem;
             opacity: 0.9;
@@ -185,6 +180,45 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0 2rem;
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         @media (max-width: 768px) {
             .columns {
                 grid-template-columns: 1fr;
@@ -197,19 +231,35 @@
             .content {
                 padding: 1rem;
             }
+
+            .tabs {
+                flex-direction: column;
+                padding: 0;
+            }
+
+            .tab {
+                padding: 0.75rem 1rem;
+                text-align: left;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="icon">🎙️</div>
             <h1>Context Cruncher Demo</h1>
             <p>See how audio becomes structured context data</p>
         </div>
 
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab(event, 'overview')">Overview</button>
+            <button class="tab" onclick="switchTab(event, 'demo')">Demo Results</button>
+            <button class="tab" onclick="switchTab(event, 'features')">Features</button>
+        </div>
+
         <div class="content">
-            <div class="intro">
+            <div id="overview" class="tab-content active">
+                <div class="intro">
                 <h2>What is Context Cruncher?</h2>
                 <p>
                     Context Cruncher transforms casual voice recordings into clean, structured context data
@@ -222,10 +272,17 @@
                     conversational audio has been transformed into organized, third-person context data ready
                     for AI applications.
                 </p>
+                </div>
+
+                <div class="cta">
+                    <h3>Ready to try it yourself?</h3>
+                    <p style="margin-bottom: 1.5rem;">Process your own audio and create structured context data</p>
+                    <a href="https://huggingface.co/spaces/danielrosehill/Context-Cruncher" target="_blank">Launch Context Cruncher</a>
+                </div>
             </div>
 
-            <div class="demo-section">
-                <h2>📊 Demo Results</h2>
+            <div id="demo" class="tab-content">
+                <h2>Demo Results</h2>
                 <p>
                     This demo processes the example audio file (<code>movie-prefs.opus</code>) included in the repository.
                     The audio contains casual thoughts about entertainment preferences, and Context Cruncher has
@@ -234,7 +291,7 @@
 
                 <div class="columns">
                     <div class="column">
-                        <h3>📝 Markdown Output</h3>
+                        <h3>Markdown Output</h3>
                         <span class="badge">Human-Readable</span>
                         <div class="output-box markdown-output">
                             <h2>User's Entertainment Preferences - Israel-Based, Tired Parent</h2>
@@ -295,7 +352,7 @@
                     </div>
 
                     <div class="column">
-                        <h3>📦 JSON Output</h3>
+                        <h3>JSON Output</h3>
                         <span class="badge">Machine-Readable</span>
                         <div class="output-box">{
   "human_readable_name": "User's Entertainment Preferences - Israel-Based, Tired Parent",
@@ -307,34 +364,50 @@
                 </div>
             </div>
 
-            <div class="demo-section">
-                <h2>✨ Key Features Demonstrated</h2>
+            <div id="features" class="tab-content">
+                <h2>Key Features Demonstrated</h2>
                 <div class="columns">
                     <div class="column">
-                        <h3>🧹 Intelligent Cleaning</h3>
+                        <h3>Intelligent Cleaning</h3>
                         <p>Removes filler words, tangents, and irrelevant information while preserving all meaningful context.</p>
                     </div>
                     <div class="column">
-                        <h3>📐 Structured Organization</h3>
+                        <h3>Structured Organization</h3>
                         <p>Automatically organizes information into logical categories and hierarchies.</p>
                     </div>
                     <div class="column">
-                        <h3>🔄 Third-Person Conversion</h3>
+                        <h3>Third-Person Conversion</h3>
                         <p>Transforms first-person narratives into third-person context data about "the user".</p>
                     </div>
                     <div class="column">
-                        <h3>📊 Multiple Formats</h3>
+                        <h3>Multiple Formats</h3>
                         <p>Outputs both human-readable Markdown and machine-readable JSON formats.</p>
                     </div>
                 </div>
             </div>
-
-            <div class="cta">
-                <h3>Ready to try it yourself?</h3>
-                <p style="margin-bottom: 1.5rem;">Process your own audio and create structured context data</p>
-                <a href="https://huggingface.co/spaces/danielrosehill/Context-Cruncher" target="_blank">Launch Context Cruncher →</a>
-            </div>
         </div>
     </div>
+
+    <script>
+        function switchTab(event, tabName) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let content of tabContents) {
+                content.classList.remove('active');
+            }
+
+            // Remove active class from all tabs
+            const tabs = document.getElementsByClassName('tab');
+            for (let tab of tabs) {
+                tab.classList.remove('active');
+            }
+
+            // Show the selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to the clicked tab
+            event.currentTarget.classList.add('active');
+        }
+    </script>
 </body>
 </html>
