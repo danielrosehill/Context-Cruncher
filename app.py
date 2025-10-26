@@ -121,17 +121,28 @@ def process_audio(
 # Custom CSS for better styling
 custom_css = """
 .gradio-container {
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 .main-header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
 }
-.status-success {
-    color: #10b981;
+.main-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
 }
-.status-error {
-    color: #ef4444;
+.main-header p {
+    color: #6b7280;
+    font-size: 1rem;
+}
+.section-header {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 1rem;
 }
 """
 
@@ -139,77 +150,145 @@ custom_css = """
 with gr.Blocks(css=custom_css, title="Context Cruncher") as demo:
     gr.Markdown(
         """
-        # 🎙️ Context Cruncher
+        # Context Cruncher
 
-        Extract structured context data from voice recordings using AI.
-        Record your thoughts, preferences, or information naturally, and get clean,
-        organized context data ready for AI applications.
+        Extract structured context data from voice recordings using AI
         """,
         elem_classes="main-header"
     )
 
-    with gr.Row():
-        with gr.Column(scale=1):
-            gr.Markdown("### 📝 Configuration")
-
-            api_key_input = gr.Textbox(
-                label="Gemini API Key",
-                placeholder="Enter your Gemini API key",
-                type="password",
-                info="Get your API key from https://ai.google.dev/"
-            )
-
-            user_identification = gr.Radio(
-                choices=["user", "name"],
-                value="user",
-                label="User Identification",
-                info="How should you be referred to in the context data?"
-            )
-
-            user_name_input = gr.Textbox(
-                label="Your Name",
-                placeholder="Enter your name",
-                visible=False,
-                info="Used when 'By Name' is selected"
-            )
-
-            gr.Markdown("### 🎤 Audio Input")
-
-            audio_recording = gr.Audio(
-                sources=["microphone"],
-                type="filepath",
-                label="Record Audio"
-            )
-
-            gr.Markdown("**OR**")
-
-            audio_upload = gr.File(
-                label="Upload Audio File",
-                file_types=["audio"],
-                type="filepath"
-            )
-
-            process_btn = gr.Button("🚀 Extract Context", variant="primary", size="lg")
-
-        with gr.Column(scale=1):
-            gr.Markdown("### 📄 Extracted Context")
-
-            status_output = gr.Textbox(
-                label="Status",
-                interactive=False,
-                show_label=True
-            )
-
-            context_display = gr.Textbox(
-                label="Context Data (Markdown)",
-                lines=15,
-                interactive=False,
-                show_copy_button=True
-            )
-
+    with gr.Tabs():
+        with gr.Tab("Extract"):
             with gr.Row():
-                markdown_download = gr.File(label="Download Markdown")
-                json_download = gr.File(label="Download JSON")
+                with gr.Column(scale=1):
+                    with gr.Accordion("Configuration", open=True):
+                        api_key_input = gr.Textbox(
+                            label="Gemini API Key",
+                            placeholder="Enter your Gemini API key",
+                            type="password",
+                            info="Get your API key from https://ai.google.dev/"
+                        )
+
+                        user_identification = gr.Radio(
+                            choices=["user", "name"],
+                            value="user",
+                            label="User Identification",
+                            info="How should you be referred to in the context data?"
+                        )
+
+                        user_name_input = gr.Textbox(
+                            label="Your Name",
+                            placeholder="Enter your name",
+                            visible=False,
+                            info="Used when 'name' is selected above"
+                        )
+
+                    gr.Markdown("### Audio Input", elem_classes="section-header")
+
+                    audio_recording = gr.Audio(
+                        sources=["microphone"],
+                        type="filepath",
+                        label="Record Audio"
+                    )
+
+                    gr.Markdown("**OR**")
+
+                    audio_upload = gr.File(
+                        label="Upload Audio File",
+                        file_types=["audio"],
+                        type="filepath"
+                    )
+
+                    process_btn = gr.Button("Extract Context", variant="primary", size="lg")
+
+                with gr.Column(scale=1):
+                    gr.Markdown("### Results", elem_classes="section-header")
+
+                    status_output = gr.Textbox(
+                        label="Status",
+                        interactive=False,
+                        show_label=True
+                    )
+
+                    context_display = gr.Textbox(
+                        label="Context Data (Markdown)",
+                        lines=18,
+                        interactive=False,
+                        show_copy_button=True
+                    )
+
+                    with gr.Row():
+                        markdown_download = gr.File(label="Download Markdown")
+                        json_download = gr.File(label="Download JSON")
+
+        with gr.Tab("About"):
+            gr.Markdown(
+                """
+                ## What is Context Cruncher?
+
+                Context Cruncher transforms casual voice recordings into clean, structured context data
+                that AI systems can use for personalization.
+
+                **Context data** refers to specific information about users that grounds AI inference
+                for more personalized results.
+
+                ## How It Works
+
+                1. **Configure** - Enter your Gemini API key and choose how you want to be identified
+                2. **Input Audio** - Either record directly in your browser or upload an audio file (MP3, WAV, OPUS)
+                3. **Extract** - Click the button and let AI clean up your recording into structured context data
+                4. **Download** - Get your context data as Markdown or JSON, or copy directly from the text area
+
+                ## What Gets Extracted
+
+                This tool processes your audio by:
+
+                - Removing irrelevant information and tangents
+                - Eliminating duplicates and redundancy
+                - Reformatting from first person to third person
+                - Organizing information hierarchically
+                - Outputting both Markdown and JSON formats
+
+                ## Example Transformation
+
+                **Raw Audio:**
+                > "Okay so... let's document my health problems... I've had asthma since I was a kid.
+                > I take a daily inhaler called Relvar for that. Oh hey Jay! What's up!
+                > Okay, where was I... I also take Vyvanse for ADHD."
+
+                **Structured Output:**
+                ```markdown
+                ## Medical Conditions
+
+                - the user has had asthma since childhood
+                - the user has adult ADHD
+
+                ## Medication List
+
+                - the user takes Relvar, daily, for asthma
+                - the user takes Vyvanse for ADHD
+                ```
+
+                ## Privacy Notice
+
+                Your audio is processed using the Gemini API. Review Google's privacy policies
+                before using this tool with sensitive information.
+
+                ## Technical Details
+
+                - **AI Model**: Gemini 2.0 Flash (multimodal audio understanding)
+                - **Processing**: Direct audio file upload to Gemini API
+                - **Output Formats**: Markdown and JSON
+
+                ## Use Cases
+
+                - AI assistant personalization
+                - Knowledge management
+                - Preference mapping
+                - Medical history documentation (note privacy considerations)
+                - Project context capture
+                """
+            )
 
     # Show/hide name input based on identification method
     def toggle_name_input(identification_choice):
@@ -237,34 +316,6 @@ with gr.Blocks(css=custom_css, title="Context Cruncher") as demo:
             json_download,
             status_output
         ]
-    )
-
-    gr.Markdown(
-        """
-        ---
-        ### 💡 How It Works
-
-        1. **Configure**: Enter your Gemini API key and choose how you want to be identified
-        2. **Input Audio**: Either record directly in your browser or upload an audio file (MP3, WAV, OPUS)
-        3. **Extract**: Click the button and let AI clean up your recording into structured context data
-        4. **Download**: Get your context data as Markdown or JSON, or copy directly from the text area
-
-        ### 📚 What is Context Data?
-
-        Context data is specific information about you that AI systems can use to provide more
-        personalized results. This tool transforms casual voice recordings into clean, structured
-        context by:
-
-        - Removing irrelevant information and tangents
-        - Eliminating duplicates
-        - Reformatting to third person
-        - Organizing hierarchically
-
-        ### 🔐 Privacy
-
-        Your audio is processed using the Gemini API. Make sure you're comfortable with
-        Google's privacy policies before using this tool with sensitive information.
-        """
     )
 
 
