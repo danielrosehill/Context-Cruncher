@@ -65,7 +65,15 @@ cp .env.example .env
 ```
 
 4. Run the application:
+
+**Option A: Using the launch script (easiest)**
 ```bash
+./run.sh
+```
+
+**Option B: Manual launch**
+```bash
+source .venv/bin/activate
 python app.py
 ```
 
@@ -135,6 +143,7 @@ Context-Cruncher/
 ├── app.py                  # Main Gradio application
 ├── gemini_processor.py     # Gemini API integration
 ├── generate_demo.py        # Demo generation script
+├── run.sh                  # Launch script
 ├── requirements.txt        # Python dependencies
 ├── .env.example           # Environment variable template
 ├── demo.html              # Demo results page
